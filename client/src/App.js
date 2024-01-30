@@ -1,25 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import HomePage from "./pages/HomePage"
+import Header from "./components/common/Header"
+
+// import other pages
 
 function App() {
+  const [location, setLocation] = useState("")
+  const handleLocationChange = (newLocation) => {
+    setLocation(newLocation)
+    // Additional actions when location changes
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <Router>
+      <Header onLocationChange={handleLocationChange} />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        // Define other routes
+      </Routes>
+    </Router>
+  )
 }
 
-export default App;
+export default App
