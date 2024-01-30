@@ -17,6 +17,9 @@ const Header = ({ onLocationChange }) => {
             <Link to="/dashboard">Dashboard</Link>
           </li>
           // Add more links as needed
+          <li>
+            <Link to="/auth">Login</Link>
+          </li>
         </ul>
       </nav>
       <div className="location-selector">

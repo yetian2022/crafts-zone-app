@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import HomePage from "./pages/HomePage"
 import Header from "./components/common/Header"
 import { useState } from "react"
+import "./components/firebaseConfig"
+import Auth from "./components/Auth"
 
 // import other pages
 
@@ -18,6 +20,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         // Define other routes
+        <Route path="/auth" element={<Auth />} />
       </Routes>
     </Router>
   )
