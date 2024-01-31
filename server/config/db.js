@@ -3,12 +3,9 @@ const mongoose = require("mongoose")
 const connectDB = async () => {
   try {
     await mongoose.connect(
-      process.env.MONGODB_URI || "mongodb://localhost:27017/yourDB",
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
+      process.env.MONGODB_URI || "mongodb://0.0.0.0:27017/yourDB"
     )
+
     console.log("MongoDB Connected...")
   } catch (err) {
     console.error(err.message)
