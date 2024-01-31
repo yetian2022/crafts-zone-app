@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from "react"
 import ServiceMenuTable from "../components/ServiceMenu/ServiceMenuTable"
 import ServiceMenuForm from "../components/ServiceMenu/ServiceMenuForm"
+import CategoryForm from "../components/ServiceMenu/CategoryForm" // Import CategoryForm
 import FilterSortPanel from "../components/ServiceMenu/FilterSortPanel"
 import {
   fetchServiceMenus,
   addMenu,
   updateMenu,
   deleteMenu,
+  addCategory, // Add addCategory to the import statement
 } from "../api/serviceMenuApi"
 
 const Admin = () => {
   const [serviceMenus, setServiceMenus] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const [showForm, setShowForm] = useState(false)
-  const [currentMenu, setCurrentMenu] = useState(null) // null for add, object for edit
+  const [showServiceForm, setShowServiceForm] = useState(false)
+  const [showCategoryForm, setShowCategoryForm] = useState(false)
+  const [currentMenu, setCurrentMenu] = useState(null)
 
   useEffect(() => {
     loadServiceMenus()
@@ -32,20 +35,36 @@ const Admin = () => {
   }
 
   const handleEdit = (menuId) => {
-    // Find the menu to edit by id
     const menuToEdit = serviceMenus.find((menu) => menu._id === menuId)
     setCurrentMenu(menuToEdit)
-    setShowForm(true)
+    setShowServiceForm(true) // Updated to setShowServiceForm
+    setShowCategoryForm(false) // Ensure category form is not shown
   }
 
   const handleDelete = async (menuId) => {
     await deleteMenu(menuId)
-    loadServiceMenus() // Refresh list after deletion
+    loadServiceMenus()
   }
 
-  const handleAddNewClick = () => {
-    setCurrentMenu(null) // Ensure form is in "add new" mode
-    setShowForm(true)
+  const handleAddNewServiceClick = () => {
+    setCurrentMenu(null)
+    setShowServiceForm(true)
+    setShowCategoryForm(false)
+  }
+
+  const handleAddNewCategoryClick = () => {
+    setShowCategoryForm(true)
+    setShowServiceForm(false)
+  }
+
+  const handleCategoryFormSave = async (category) => {
+    try {
+      await addCategory(category)
+      setShowCategoryForm(false)
+      // Optionally refresh your categories here if needed
+    } catch (error) {
+      console.error("Error adding category:", error)
+    }
   }
 
   const handleFormSave = async (menu) => {
@@ -54,20 +73,20 @@ const Admin = () => {
     } else {
       await addMenu(menu)
     }
-    setShowForm(false)
-    loadServiceMenus() // Refresh list after add/update
+    setShowServiceForm(false) // Updated to setShowServiceForm
   }
 
   const handleFormClose = () => {
-    setShowForm(false)
+    setShowServiceForm(false) // Updated to setShowServiceForm
+    setShowCategoryForm(false) // Hide category form if open
   }
 
   const onSortChange = (sortValue) => {
-    // Implement sorting logic here based on sortValue
+    // Sorting logic
   }
 
   const onFilterChange = (filterValue) => {
-    // Implement filtering logic here based on filterValue
+    // Filtering logic
   }
 
   if (isLoading) return <p>Loading...</p>
@@ -79,16 +98,23 @@ const Admin = () => {
         onFilterChange={onFilterChange}
         onSortChange={onSortChange}
       />
-      <button onClick={handleAddNewClick}>Add New Service</button>
+      <button onClick={handleAddNewServiceClick}>Add New Service</button>
+      <button onClick={handleAddNewCategoryClick}>Add New Category</button>
       <ServiceMenuTable
         serviceMenus={serviceMenus}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
-      {showForm && (
+      {showServiceForm && (
         <ServiceMenuForm
           initialData={currentMenu}
           onSave={handleFormSave}
+          onClose={handleFormClose}
+        />
+      )}
+      {showCategoryForm && (
+        <CategoryForm
+          // Add props and onSave logic for CategoryForm
           onClose={handleFormClose}
         />
       )}

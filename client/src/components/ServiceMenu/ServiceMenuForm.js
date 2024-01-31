@@ -9,7 +9,7 @@ const ServiceMenuForm = ({ initialData = null, onSave, onClose }) => {
       {
         name: "",
         profilePic: "",
-        projects: [{ name: "", price: "", duration: "" }],
+        projects: [{ name: "", price: "", duration: "", categoryName: "" }],
       },
     ],
   })
@@ -24,7 +24,6 @@ const ServiceMenuForm = ({ initialData = null, onSave, onClose }) => {
     setMenuData({ ...menuData, [event.target.name]: event.target.value })
   }
 
-  // Adjusting to directly handle event changes
   const handleCategoryChange = (categoryIndex, event) => {
     const { name, value } = event.target
     const updatedCategories = [...menuData.categories]
@@ -35,14 +34,9 @@ const ServiceMenuForm = ({ initialData = null, onSave, onClose }) => {
     setMenuData({ ...menuData, categories: updatedCategories })
   }
 
-  // Updating projects requires passing event to access target values
-  const handleProjectChange = (categoryIndex, projectIndex, event) => {
-    const { name, value } = event.target
+  const handleProjectChange = (categoryIndex, projectIndex, updatedProject) => {
     const updatedProjects = [...menuData.categories[categoryIndex].projects]
-    updatedProjects[projectIndex] = {
-      ...updatedProjects[projectIndex],
-      [name]: value,
-    }
+    updatedProjects[projectIndex] = updatedProject
 
     const updatedCategories = [...menuData.categories]
     updatedCategories[categoryIndex].projects = updatedProjects
@@ -69,12 +63,26 @@ const ServiceMenuForm = ({ initialData = null, onSave, onClose }) => {
           />
         </div>
         {menuData.categories.map((category, categoryIndex) => (
-          <CategoryForm
-            key={categoryIndex}
-            category={category}
-            onCategoryChange={(e) => handleCategoryChange(categoryIndex, e)}
-            categoryIndex={categoryIndex}
-          />
+          <div key={`category-${categoryIndex}`}>
+            <CategoryForm
+              category={category}
+              onCategoryChange={(e) => handleCategoryChange(categoryIndex, e)}
+            />
+            {category.projects.map((project, projectIndex) => (
+              <ProjectForm
+                key={`project-${projectIndex}`}
+                project={project}
+                categories={menuData.categories} // Pass all categories for the dropdown
+                onProjectChange={(updatedProject) =>
+                  handleProjectChange(
+                    categoryIndex,
+                    projectIndex,
+                    updatedProject
+                  )
+                }
+              />
+            ))}
+          </div>
         ))}
         <button type="submit">Save</button>
         <button type="button" onClick={onClose}>

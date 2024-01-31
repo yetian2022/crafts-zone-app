@@ -32,8 +32,8 @@ app.use(passport.session()) // For persistent login sessions
 // Use the serviceMenuMiddleware routes for API calls
 app.use("/api/service-menu", serviceMenuMiddleware)
 
-// Use the serviceMenu routes for API calls
-// app.use("/api/service-menu", serviceMenuRoutes)
+// Use the categories API handler for routes that begin with /api/categories
+app.use("/api/categories", require("./routes/api/categoriesApi"))
 
 app.get("/", (req, res) => {
   res.send("Hello World!")
