@@ -31,9 +31,16 @@ const Admin = () => {
     }
   }
 
-  const handleRowClick = (menu) => {
-    setCurrentMenu(menu)
-    setShowForm(true) // Assuming ServiceMenuForm is shown in a modal or similar
+  const handleEdit = (menuId) => {
+    // Find the menu to edit by id
+    const menuToEdit = serviceMenus.find((menu) => menu._id === menuId)
+    setCurrentMenu(menuToEdit)
+    setShowForm(true)
+  }
+
+  const handleDelete = async (menuId) => {
+    await deleteMenu(menuId)
+    loadServiceMenus() // Refresh list after deletion
   }
 
   const handleAddNewClick = () => {
@@ -75,7 +82,8 @@ const Admin = () => {
       <button onClick={handleAddNewClick}>Add New Service</button>
       <ServiceMenuTable
         serviceMenus={serviceMenus}
-        onRowClick={handleRowClick}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
       {showForm && (
         <ServiceMenuForm
