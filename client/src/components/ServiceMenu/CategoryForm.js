@@ -1,36 +1,44 @@
-import React from "react"
+import React, { useState } from "react"
 
-const CategoryForm = ({
-  category = { name: "", profilePic: "" },
-  onCategoryChange,
-  categoryIndex,
-}) => {
-  // Handler to capture changes and propagate them up to the parent component
+const CategoryForm = ({ onSave, onClose, initialCategory }) => {
+  const [category, setCategory] = useState(
+    initialCategory || { name: "", profilePic: "" }
+  )
+
   const handleChange = (e) => {
-    const { name, value } = e.target
-    // Construct the updated category object
-    const updatedCategory = { ...category, [name]: value }
-    // Call the parent handler with the updated object
-    onCategoryChange(categoryIndex, updatedCategory)
+    setCategory({ ...category, [e.target.name]: e.target.value })
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    onSave(category)
   }
 
   return (
-    <div>
-      <label>Category Name:</label>
-      <input
-        type="text"
-        name="name"
-        value={category.name}
-        onChange={handleChange} // Use the local handler
-      />
-      <label>Profile Picture URL:</label>
-      <input
-        type="text"
-        name="profilePic"
-        value={category.profilePic}
-        onChange={handleChange} // Use the local handler
-      />
-    </div>
+    <form onSubmit={handleSubmit}>
+      <label>
+        Name:
+        <input
+          type="text"
+          name="name"
+          value={category.name}
+          onChange={handleChange}
+        />
+      </label>
+      <label>
+        Profile Picture URL:
+        <input
+          type="text"
+          name="profilePic"
+          value={category.profilePic}
+          onChange={handleChange}
+        />
+      </label>
+      <button type="submit">Save</button>
+      <button type="button" onClick={onClose}>
+        Cancel
+      </button>
+    </form>
   )
 }
 

@@ -4,7 +4,9 @@ const express = require("express")
 const connectDB = require("./config/db")
 const session = require("express-session")
 const passport = require("passport")
-const serviceMenuMiddleware = require("./middleware/serviceMenuMiddleware")
+
+const categoryRoutes = require("./api/categories")
+const projectRoutes = require("./api/projects")
 
 const app = express()
 app.use(express.json()) // Body parser middleware
@@ -29,15 +31,8 @@ console.log("MongoDB Connected...")
 app.use(passport.initialize())
 app.use(passport.session()) // For persistent login sessions
 
-// Use the serviceMenuMiddleware routes for API calls
-app.use("/api/service-menu", serviceMenuMiddleware)
-
-// Use the categories API handler for routes that begin with /api/categories
-app.use("/api/categories", require("./routes/api/categoriesApi"))
-
-app.get("/", (req, res) => {
-  res.send("Hello World!")
-})
+app.use("/api/categories", categoryRoutes)
+app.use("/api/projects", projectRoutes)
 
 const PORT = process.env.PORT || 4000
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))

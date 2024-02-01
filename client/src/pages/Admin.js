@@ -1,25 +1,30 @@
 import React, { useState, useEffect } from "react"
-import ServiceMenuTable from "../components/ServiceMenu/ServiceMenuTable"
-import ServiceMenuForm from "../components/ServiceMenu/ServiceMenuForm"
-import CategoryForm from "../components/ServiceMenu/CategoryForm" // Import CategoryForm
+import CategoryForm from "../components/ServiceMenu/CategoryForm"
 import FilterSortPanel from "../components/ServiceMenu/FilterSortPanel"
 import {
   fetchServiceMenus,
-  addMenu,
-  updateMenu,
   deleteMenu,
-  addCategory, // Add addCategory to the import statement
+  addCategory,
+  fetchCategories,
 } from "../api/serviceMenuApi"
+import ProjectTable from "../components/ServiceMenu/ProjectTable"
 
 const Admin = () => {
   const [serviceMenus, setServiceMenus] = useState([])
+  const [categories, setCategories] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const [showServiceForm, setShowServiceForm] = useState(false)
   const [showCategoryForm, setShowCategoryForm] = useState(false)
-  const [currentMenu, setCurrentMenu] = useState(null)
+  const [currentCategory, setCurrentCategory] = useState({
+    name: "",
+    profilePic: "",
+  })
+  // State for locations and projects
+  const [locations, setLocations] = useState([])
+  const [projects, setProjects] = useState([])
 
   useEffect(() => {
     loadServiceMenus()
+    loadCategories()
   }, [])
 
   const loadServiceMenus = async () => {
@@ -34,11 +39,21 @@ const Admin = () => {
     }
   }
 
-  const handleEdit = (menuId) => {
-    const menuToEdit = serviceMenus.find((menu) => menu._id === menuId)
-    setCurrentMenu(menuToEdit)
-    setShowServiceForm(true) // Updated to setShowServiceForm
-    setShowCategoryForm(false) // Ensure category form is not shown
+  const loadCategories = async () => {
+    setIsLoading(true)
+    try {
+      const fetchedCategories = await fetchCategories() // Ensure fetchCategories is imported and defined
+      setCategories(fetchedCategories) // Update the categories state
+    } catch (error) {
+      console.error("Error fetching categories:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleAddNewCategoryClick = () => {
+    setCurrentCategory({ name: "", profilePic: "" })
+    setShowCategoryForm(true)
   }
 
   const handleDelete = async (menuId) => {
@@ -46,47 +61,33 @@ const Admin = () => {
     loadServiceMenus()
   }
 
-  const handleAddNewServiceClick = () => {
-    setCurrentMenu(null)
-    setShowServiceForm(true)
-    setShowCategoryForm(false)
-  }
-
-  const handleAddNewCategoryClick = () => {
-    setShowCategoryForm(true)
-    setShowServiceForm(false)
-  }
-
   const handleCategoryFormSave = async (category) => {
-    try {
-      await addCategory(category)
-      setShowCategoryForm(false)
-      // Optionally refresh your categories here if needed
-    } catch (error) {
-      console.error("Error adding category:", error)
-    }
-  }
-
-  const handleFormSave = async (menu) => {
-    if (currentMenu) {
-      await updateMenu(currentMenu._id, menu)
-    } else {
-      await addMenu(menu)
-    }
-    setShowServiceForm(false) // Updated to setShowServiceForm
+    await addCategory(category)
+    setShowCategoryForm(false)
+    loadCategories()
   }
 
   const handleFormClose = () => {
-    setShowServiceForm(false) // Updated to setShowServiceForm
-    setShowCategoryForm(false) // Hide category form if open
+    setShowCategoryForm(false)
   }
 
   const onSortChange = (sortValue) => {
-    // Sorting logic
+    // Implement sorting logic
   }
 
   const onFilterChange = (filterValue) => {
-    // Filtering logic
+    // Implement filtering logic
+  }
+
+  // Handlers for button clicks
+  const handleAddNewLocation = () => {
+    setLocations([...locations, ""])
+  }
+  const handleAddNewCategory = () => {
+    setCategories([...categories, ""])
+  }
+  const handleAddNewProject = () => {
+    setProjects([...projects, ""])
   }
 
   if (isLoading) return <p>Loading...</p>
@@ -98,23 +99,14 @@ const Admin = () => {
         onFilterChange={onFilterChange}
         onSortChange={onSortChange}
       />
-      <button onClick={handleAddNewServiceClick}>Add New Service</button>
-      <button onClick={handleAddNewCategoryClick}>Add New Category</button>
-      <ServiceMenuTable
-        serviceMenus={serviceMenus}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
-      {showServiceForm && (
-        <ServiceMenuForm
-          initialData={currentMenu}
-          onSave={handleFormSave}
-          onClose={handleFormClose}
-        />
-      )}
+      <button onClick={handleAddNewLocation}>Add New Location</button>
+      <button onClick={handleAddNewCategory}>Add New Category</button>
+      <button onClick={handleAddNewProject}>Add New Project</button>
+      <ProjectTable projects={projects} />
       {showCategoryForm && (
         <CategoryForm
-          // Add props and onSave logic for CategoryForm
+          category={currentCategory}
+          onSave={handleCategoryFormSave}
           onClose={handleFormClose}
         />
       )}
